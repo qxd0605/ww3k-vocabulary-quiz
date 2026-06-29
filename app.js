@@ -22,6 +22,7 @@ const elements = {
 
 let activeBookId = books[0]?.id;
 let advanceTimer = null;
+let pronunciationAudio = null;
 
 function shuffle(items) {
   const copy = [...items];
@@ -126,6 +127,7 @@ function render() {
 }
 
 function showQuestion(book, session) {
+  stopPronunciation();
   const current = session.current;
   elements.feedback.textContent = "";
   elements.feedback.className = "feedback";
@@ -203,15 +205,66 @@ function restart() {
   render();
 }
 
+function stopPronunciation() {
+  if (!pronunciationAudio) return;
+  pronunciationAudio.pause();
+  pronunciationAudio.src = "";
+  pronunciationAudio = null;
+  elements.sound.classList.remove("playing");
+}
+
+function useSystemVoice(word) {
+  if (!("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) return false;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(word);
+  utterance.lang = "en-US";
+  utterance.rate = 0.82;
+  utterance.onend = () => elements.sound.classList.remove("playing");
+  utterance.onerror = () => {
+    elements.sound.classList.remove("playing");
+    elements.feedback.textContent = "暂时无法播放发音";
+    elements.feedback.className = "feedback bad";
+  };
+  window.speechSynthesis.speak(utterance);
+  return true;
+}
+
 function speakWord() {
   const book = getActiveBook();
   const session = getSession(book);
-  if (!session.current || !("speechSynthesis" in window)) return;
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(session.current.item.word);
-  utterance.lang = "en-US";
-  utterance.rate = 0.82;
-  window.speechSynthesis.speak(utterance);
+  if (!session.current) return;
+
+  const word = session.current.item.word;
+  stopPronunciation();
+  elements.sound.classList.add("playing");
+  pronunciationAudio = new Audio(
+    `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word)}&type=2`
+  );
+  pronunciationAudio.preload = "auto";
+  pronunciationAudio.setAttribute("playsinline", "");
+  pronunciationAudio.addEventListener("ended", () => {
+    elements.sound.classList.remove("playing");
+  }, { once: true });
+  pronunciationAudio.addEventListener("error", () => {
+    pronunciationAudio = null;
+    if (!useSystemVoice(word)) {
+      elements.sound.classList.remove("playing");
+      elements.feedback.textContent = "暂时无法播放发音";
+      elements.feedback.className = "feedback bad";
+    }
+  }, { once: true });
+
+  const playback = pronunciationAudio.play();
+  if (playback && typeof playback.catch === "function") {
+    playback.catch(() => {
+      pronunciationAudio = null;
+      if (!useSystemVoice(word)) {
+        elements.sound.classList.remove("playing");
+        elements.feedback.textContent = "暂时无法播放发音";
+        elements.feedback.className = "feedback bad";
+      }
+    });
+  }
 }
 
 elements.sound.addEventListener("click", speakWord);
