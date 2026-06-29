@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#16736f">
+  <title>词汇闯关</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand-mark" aria-hidden="true">W</div>
+    <div>
+      <h1>词汇闯关</h1>
+      <p>WW3K 单词练习</p>
+    </div>
+  </header>
+
+  <nav class="book-tabs" id="book-tabs" aria-label="选择英语难度"></nav>
+
+  <main>
+    <section class="status-band" aria-label="本轮进度">
+      <div class="status-copy">
+        <div>
+          <span class="mode-label" id="mode-label">中英双向</span>
+          <strong id="book-title">Book 2</strong>
+        </div>
+        <span id="progress-text">第 1 / 150 题</span>
+      </div>
+      <div class="progress-track" aria-hidden="true">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="score-row">
+        <span>答对 <strong id="correct-count">0</strong></span>
+        <span>还剩 <strong id="remaining-count">150</strong></span>
+      </div>
+    </section>
+
+    <section class="quiz-panel" id="quiz-panel" aria-live="polite">
+      <div class="question-topline">
+        <span id="question-label">请选择正确的中文意思</span>
+        <button class="sound-button" id="sound-button" type="button" title="朗读单词" aria-label="朗读单词">🔊</button>
+      </div>
+      <div class="question" id="question">calf</div>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback" role="status" aria-live="assertive"></div>
+    </section>
+
+    <section class="finish-panel" id="finish-panel" hidden>
+      <div class="finish-badge" aria-hidden="true">✓</div>
+      <h2>这一册完成啦！</h2>
+      <p id="finish-summary"></p>
+      <button class="primary-button" id="restart-button" type="button">再来一轮</button>
+    </section>
+  </main>
+
+  <footer>题目来自 ww3k 单词表.xlsx · 每轮不重复</footer>
+
+  <script src="words-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+
