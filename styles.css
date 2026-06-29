@@ -176,6 +176,7 @@ main {
 }
 
 .sound-button[hidden] { display: none; }
+.sound-button.playing { border-color: var(--teal); background: var(--teal-soft); }
 
 .question {
   display: flex;
